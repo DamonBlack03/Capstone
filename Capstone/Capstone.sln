@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.29609.76
+VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capstone", "Capstone.csproj", "{5640DEC9-3917-49F1-9071-6834D6EC99AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capstone", "Capstone.csproj", "{FA4D4541-D1E8-4587-9328-B7543806BD6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5640DEC9-3917-49F1-9071-6834D6EC99AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5640DEC9-3917-49F1-9071-6834D6EC99AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5640DEC9-3917-49F1-9071-6834D6EC99AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5640DEC9-3917-49F1-9071-6834D6EC99AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA4D4541-D1E8-4587-9328-B7543806BD6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA4D4541-D1E8-4587-9328-B7543806BD6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA4D4541-D1E8-4587-9328-B7543806BD6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA4D4541-D1E8-4587-9328-B7543806BD6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {0A16C9A6-E34A-4197-94B4-05945220AA64}
+		SolutionGuid = {99AD9B53-1EED-4A9C-BA82-8A66E3E0F4ED}
 	EndGlobalSection
 EndGlobal
