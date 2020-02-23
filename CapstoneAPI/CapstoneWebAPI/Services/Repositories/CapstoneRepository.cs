@@ -11,10 +11,14 @@ namespace CapstoneWebAPI.Services.Repositories
     public class CapstoneRepository : ICapstoneRepository
     {
         private readonly CapstoneContext _context;
+        public DayRepository dayRepository { get; set; }
+        public TaskRepository taskRepository { get; set; }
 
-        public CapstoneRepository(CapstoneContext context)
+        public CapstoneRepository(CapstoneContext context, DayContext dayContext, TaskContext taskContext)
         {
             _context = context;
+            dayRepository = new DayRepository(dayContext, taskContext);
+            taskRepository = new TaskRepository(taskContext);
         }
 
         public bool CapstoneExists(int id)
@@ -44,7 +48,17 @@ namespace CapstoneWebAPI.Services.Repositories
 
         public void RemoveCapstone(int id)
         {
-            _context.Capstones.Remove(GetCapstoneById(id));
+            Capstone capstone = GetCapstoneById(id);
+
+            List<Day> days = dayRepository.GetDaysByCapstoneId(id);
+
+            foreach (Day day in days)
+            {
+                dayRepository.RemoveDay(day.DayId);
+            }
+
+            _context.Capstones.Remove(capstone);
+            _context.SaveChanges();
         }
 
         public void UpdateCapstone(Capstone capstone)

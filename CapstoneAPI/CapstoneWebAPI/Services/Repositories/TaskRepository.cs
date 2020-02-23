@@ -26,6 +26,11 @@ namespace CapstoneWebAPI.Services.Repositories
             return _context.Tasks.SingleOrDefault(t => t.TaskId == id);
         }
 
+        public List<Task> GetTaskByCategory(string category)
+        {
+            return _context.Tasks.Where(t => t.Category == category).ToList();
+        }
+
         public List<Task> GetTasksByDayId(int id)
         {
             return _context.Tasks.Where(t => t.DayId == id).ToList();
@@ -34,6 +39,7 @@ namespace CapstoneWebAPI.Services.Repositories
         public void RemoveTask(int id)
         {
             _context.Tasks.Remove(GetTaskById(id));
+            _context.SaveChanges();
         }
 
         public bool TaskExists(int id)

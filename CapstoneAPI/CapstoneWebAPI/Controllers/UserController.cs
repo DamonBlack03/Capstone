@@ -5,7 +5,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using CapstoneWebAPI.Models;
 using CapstoneWebAPI.Models.Contexts;
 using CapstoneWebAPI.Models.Helpers;
@@ -45,9 +44,9 @@ namespace CapstoneWebAPI.Controllers
 
             _configuration = configuration;
 
-            userRepository = new UserRepository(_userContext);
-            capstoneRepository = new CapstoneRepository(_capstoneContext);
-            dayRepository = new DayRepository(_dayContext);
+            userRepository = new UserRepository(_userContext, _capstoneContext, _dayContext, _taskContext);
+            capstoneRepository = new CapstoneRepository(_capstoneContext, _dayContext, _taskContext);
+            dayRepository = new DayRepository(_dayContext, _taskContext);
             taskRepository = new TaskRepository(_taskContext);
         }
 
@@ -163,7 +162,7 @@ namespace CapstoneWebAPI.Controllers
 
             if (user == null)
             {
-                NotFound();
+                return NotFound();
             }
 
             return Ok(new { status = 200, user });
@@ -204,14 +203,19 @@ namespace CapstoneWebAPI.Controllers
         [Authorize]
         public ActionResult DeleteUser([Required] int id)
         {
-            if (userRepository.UserExists(id))
+            if (!UserExists(id))
             {
-                userRepository.RemoveUser(id);
-                _userContext.SaveChanges();
-                return NoContent();
+                return NotFound();
             }
 
-            return NotFound();
+            userRepository.RemoveUser(id);
+            //_userContext.SaveChanges();
+
+            return NoContent();
+        }
+        private bool UserExists(int id)
+        {
+            return userRepository.UserExists(id);
         }
 
         #endregion
@@ -289,7 +293,7 @@ namespace CapstoneWebAPI.Controllers
 
         [HttpPut("{UserId}/Capstone/{capstoneId}")]
         [Authorize]
-        public ActionResult PutUser([Required] int UserId, [Required] int capstoneId, [FromBody, Required] Capstone capstone)
+        public ActionResult PutCapstone([Required] int UserId, [Required] int capstoneId, [FromBody, Required] Capstone capstone)
         {
             if (capstoneId != capstone.CapstoneId)
             {
@@ -315,7 +319,7 @@ namespace CapstoneWebAPI.Controllers
             }
 
 
-            return Ok();//CreatedAtRoute("GetCapstoneById", new { UserId = UserId, capstoneId = capstoneId }, capstone);
+            return Ok();
         }
 
         #endregion
@@ -327,7 +331,7 @@ namespace CapstoneWebAPI.Controllers
             return dayRepository.DayExists(id);
         }
 
-        [HttpPost("{userId}/Capstone/{capstoneId}"), Authorize]
+        [HttpPost("Capstone/{capstoneId}/Day"), Authorize]
         public ActionResult CreateDay([Required, FromBody] Day day, [Required] int capstoneId)
         {
             if (day == null)
@@ -346,15 +350,186 @@ namespace CapstoneWebAPI.Controllers
             return Ok();
         }
         
-        [HttpGet("{userId}/Capstone/{captoneId}/Day/{dayId}"), Authorize]
-        public ActionResult GetDayById(int dayId)
+        [HttpGet("Capstone/{capstoneId}/Day/{dayId}"), Authorize]
+        public ActionResult GetDayById([Required] int dayId)
         {
+            if (!DayExists(dayId))
+            {
+                return BadRequest("Day does not exist");
+            }
+            Day day = dayRepository.GetDayById(dayId);
+
+
+
+            return Ok(new { status = 200, day });
+        }
+
+        [HttpGet("Capstone/{capstoneId}/Days"), Authorize]
+        public ActionResult GetDaysByCapstoneId([Required] int capstoneId)
+        {
+            if (!CapstoneExists(capstoneId))
+            {
+                return BadRequest("Capstone with this Id does not exist");
+            }
+
+            List<Day> days = dayRepository.GetDaysByCapstoneId(capstoneId);
+
+            if (days.Count < 1)
+            {
+                return NotFound("No days found for this Capstone");
+            }
+
+
+            return Ok(new { status = 200, days });
+        }
+
+        [HttpDelete("Capstone/{capstoneId}/Day/{dayId}"), Authorize]
+        public ActionResult DeleteDayById([Required] int dayId)
+        {
+            if (!DayExists(dayId))
+            {
+                return BadRequest("day with this Id does not exist");
+            }
+
+            dayRepository.RemoveDay(dayId);
+            _dayContext.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpPut("Capstone/{capstoneId}/Day/{dayId}")]
+        [Authorize]
+        public ActionResult PutDay([Required] int capstoneId, [Required] int dayId, [FromBody, Required] Day day)
+        {
+            if (capstoneId != day.CapstoneId)
+            {
+                return BadRequest();
+            }
+
+            _dayContext.Entry(day).State = EntityState.Modified;
+
+            try
+            {
+                _dayContext.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!dayRepository.DayExists(dayId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+
             return Ok();
         }
 
         #endregion
 
         #region Task CRUD
+
+        private bool TaskExists(int taskId)
+        {
+            return taskRepository.TaskExists(taskId);
+        }
+
+        [HttpPost("Day/{dayId}/Task"), Authorize]
+        public ActionResult CreateTask( [Required] int dayId, [Required, FromBody] Task task)
+        {
+            if (task == null)
+            {
+                return BadRequest("");
+            }
+            if (task.DayId != dayId)
+            {
+                return BadRequest();
+            }
+
+            taskRepository.CreateTask(task);
+            _taskContext.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpGet("Day/{dayId}/Task/{taskId}"), Authorize]
+        public ActionResult GetTaskById([Required] int taskId)
+        {
+            if (!TaskExists(taskId))
+            {
+                return BadRequest("Task with this Id does not exist");
+            }
+
+            Task task = taskRepository.GetTaskById(taskId);
+
+            return Ok(new { status = 200, task });
+        }
+        
+        [HttpGet("Day/{dayId}/Tasks"), Authorize]
+        public ActionResult GetTaskByDayId([Required] int dayId)
+        {
+            if (!DayExists(dayId))
+            {
+                return BadRequest("There is no day with this Id");
+            }
+
+            List<Task> tasks = taskRepository.GetTasksByDayId(dayId);
+
+            if (tasks.Count < 1)
+            {
+                return NotFound("There are no Tasks for this Day");
+            }
+
+            return Ok(new { status = 200, tasks });
+        }
+
+        [HttpDelete("Day/{dayId}/Task/{taskId}"), Authorize]
+        public ActionResult DeleteTaskById([Required] int taskId)
+        {
+            if (!TaskExists(taskId))
+            {
+                return BadRequest("No task exists with this id");
+            }
+
+            taskRepository.RemoveTask(taskId);
+            _taskContext.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpPut("Day/{dayId}/Task/{taskId}")]
+        [Authorize]
+        public ActionResult PutTask([Required] int dayId, [Required] int taskId, [FromBody, Required] Task task)
+        {
+            if (dayId != task.DayId)
+            {
+                return BadRequest();
+            }
+
+            _taskContext.Entry(task).State = EntityState.Modified;
+
+            try
+            {
+                _taskContext.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!taskRepository.TaskExists(taskId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+
+            return Ok();
+        }
 
         #endregion
 
