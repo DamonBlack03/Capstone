@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import DayView from './DayView';
 
 const SetupScreen = props => {
     const [hoursPerWeek, setHoursPerWeek] = useState(0);
@@ -100,7 +99,6 @@ const SetupScreen = props => {
     return (
         <>
             <div className="root-container">
-                
                 <div className="box-container">
                     <div className="inner-container">
                         <div className="header">
