@@ -114,6 +114,7 @@ namespace CapstoneWebAPI.Controllers
             return userRepository.UserExists(email);
         }
 
+
         private bool AccountExists(int id)
         {
             return userRepository.UserExists(id);

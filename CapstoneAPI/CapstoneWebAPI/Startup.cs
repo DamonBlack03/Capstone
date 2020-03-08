@@ -76,12 +76,11 @@ namespace CapstoneWebAPI
 
             app.UseRouting();
 
+            app.UseCors(value => value.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             IdentityModelEventSource.ShowPII = true;
 
             app.UseAuthorization();
-
-            app.UseCors();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
