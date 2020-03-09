@@ -5,7 +5,7 @@ import { CRUDCommands } from "./CRUDCommands";
 
 const HomeScreen = props => {
   const info = JSON.parse(localStorage.getItem("info"));
-  const { token } = info;
+  const { token } = info ? info : {};
   //const capstoneId = props.capstoneId;
   const userId = props.userId;
   const [capstoneInfo, setCapstoneInfo] = useState({});
@@ -46,16 +46,17 @@ const HomeScreen = props => {
                   Description: {capstoneInfo.description}
                 </label>
                 <label className="display-label">
-                  Hours Worked: {capstoneInfo.totalMinutesWorked / 60}
+                  Hours Worked:{" "}
+                  {Math.floor(capstoneInfo.totalMinutesWorked / 60)}
                 </label>
                 <label className="display-label">
-                  Hours Busy: {capstoneInfo.totalMinutesBusy / 60}
+                  Hours Busy: {Math.floor(capstoneInfo.totalMinutesBusy / 60)}
                 </label>
                 <label className="display-label">
-                  Hours Sleep: {capstoneInfo.totalMinutesSleep / 60}
+                  Hours Sleep: {Math.floor(capstoneInfo.totalMinutesSleep / 60)}
                 </label>
                 <label className="display-label">
-                  Hours Fun: {capstoneInfo.totalMinutesFun / 60}
+                  Hours Fun: {Math.floor(capstoneInfo.totalMinutesFun / 60)}
                 </label>
                 <label className="display-label">
                   Meeting day: {capstoneInfo.meetingDay}

@@ -268,14 +268,21 @@ namespace CapstoneWebAPI.Controllers
         [HttpGet("{UserId}/Capstones"), Authorize]
         public ActionResult GetCapstonesByUserId([Required] int UserId)
         {
-            List<Models.Capstone> capstones = capstoneRepository.GetCapstonesByUserId(UserId);
+            List<Capstone> capstones = capstoneRepository.GetCapstonesByUserId(UserId);
 
             if (capstones.Count == 0)
             {
                 return BadRequest("No Capstones for this user");
             }
 
-            return Ok(new { status = 200, capstones });
+            List<List<Day>> days = new List<List<Day>>();
+
+            foreach (Capstone capstone in capstones)
+            {
+                days.Add(dayRepository.GetDaysByCapstoneId(capstone.CapstoneId));
+            }
+
+            return Ok(new { status = 200, capstones, days});
         }
 
         [HttpDelete("{UserId}/Capstone/{capstoneId}"), Authorize]
@@ -347,7 +354,7 @@ namespace CapstoneWebAPI.Controllers
 
             dayRepository.CreateDay(day);
             _dayContext.SaveChanges();
-
+            capstoneRepository.UpdateCapstone(capstoneRepository.GetCapstoneById(capstoneId));
             return Ok();
         }
         
@@ -379,13 +386,17 @@ namespace CapstoneWebAPI.Controllers
             {
                 return NotFound("No days found for this Capstone");
             }
+            List<ActionResult> tasks = new List<ActionResult>();// = GetTaskByDayId(1);
+            foreach (Day day in days)
+            {
+                tasks.Add(GetTaskByDayId(day.DayId));
+            }
 
-
-            return Ok(new { status = 200, days });
+            return Ok(new { status = 200, days, tasks });
         }
 
         [HttpDelete("Capstone/{capstoneId}/Day/{dayId}"), Authorize]
-        public ActionResult DeleteDayById([Required] int dayId)
+        public ActionResult DeleteDayById([Required] int dayId, [Required] int capstoneId)
         {
             if (!DayExists(dayId))
             {
@@ -394,7 +405,7 @@ namespace CapstoneWebAPI.Controllers
 
             dayRepository.RemoveDay(dayId);
             _dayContext.SaveChanges();
-
+            capstoneRepository.UpdateCapstone(capstoneRepository.GetCapstoneById(capstoneId));
             return NoContent();
         }
 

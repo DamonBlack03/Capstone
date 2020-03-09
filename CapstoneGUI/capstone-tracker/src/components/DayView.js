@@ -70,7 +70,7 @@ const DayView = props => {
           <div className="display-view">Day {props.dayNum}</div>
           <div className="display-view">
             <label className="display-label">
-              Date: {props.date.toDateString()}
+              Date: {new Date(props.date).toDateString()}
             </label>
             <label className="display-label">
               Hours Worked: {props.worked}

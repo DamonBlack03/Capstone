@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import axios from "axios";
 import CaseSensitivePathsWebpackPlugin from "case-sensitive-paths-webpack-plugin";
 
 const LoginBox = props => {
   const [email, setemail] = useState("");
   const [password, setPassword] = useState({});
+  const history = useHistory();
 
   const onHandleLogin = e => {
     //console.log(`logging in... email: ${email} Password: ${password}`);
@@ -16,6 +17,7 @@ const LoginBox = props => {
       })
       .then(res => JSON.stringify(res.data))
       .then(res => localStorage.setItem("info", res))
+      .then(() => history.push("/home"))
       .catch(error => console.log(error));
   };
 
@@ -29,6 +31,7 @@ const LoginBox = props => {
   };
 
   // localStorage.clear();
+  // setemail(email);
   console.log(localStorage.getItem(email) || "token not found");
   return (
     <>

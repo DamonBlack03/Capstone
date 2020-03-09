@@ -63,7 +63,25 @@ namespace CapstoneWebAPI.Services.Repositories
 
         public void UpdateCapstone(Capstone capstone)
         {
-            throw new NotImplementedException();
+            List<Day> days = dayRepository.GetDaysByCapstoneId(capstone.CapstoneId);
+            int totB = 0;
+            int totW = 0;
+            int totS = 0;
+            int totF = 0;
+            days.ForEach(d => {
+                totB += d.TotalMinutesBusy; 
+                totW += d.TotalMinutesWorked;
+                totS += d.TotalMinutesSleep;
+                totF += d.TotalMinutesFun;
+            });
+            capstone.TotalMinutesBusy = totB;
+            capstone.TotalMinutesFun = totF;
+            capstone.TotalMinutesSleep = totS;
+            capstone.TotalMinutesWorked = totW;
+
+            _context.Update(capstone);
+            _context.SaveChanges();
         }
+        
     }
 }

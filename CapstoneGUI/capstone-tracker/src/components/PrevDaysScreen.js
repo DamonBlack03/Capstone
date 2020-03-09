@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import DayView from "./DayView";
-import { inc } from "semver";
 import { Redirect } from "react-router";
+import axios from "axios";
 
 const PrevDaysScreen = props => {
   const [curIndex, setCurIndex] = useState(0);
-  //const [curDay, setCurDay] = useState(props.days[0]);
+  const info = JSON.parse(localStorage.getItem("info"));
+  const { token } = info ? info : {};
+  // const [days, setDays] = useState([]);
+  let dayArr = [];
+  // const [curDay, setCurDay] = useState(props.days[0]);
 
   const incCurIndexChange = () => {
     let temp = curIndex;
-    if (temp === props.days.length - 1) {
+    if (temp === dayArr.length - 1) {
       temp = 0;
     } else {
       temp += 1;
@@ -20,12 +24,51 @@ const PrevDaysScreen = props => {
   const decCurIndexChange = () => {
     let temp = curIndex;
     if (temp === 0) {
-      temp = props.days.length - 1;
+      temp = dayArr.length - 1;
     } else {
       temp -= 1;
     }
     setCurIndex(temp);
   };
+
+  const [listDays, setListDays] = useState({});
+
+  const getDays = () => {
+    axios({
+      method: "get",
+      url: `https://localhost:44343/api/User/Capstone/5/Days`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => res.data)
+      .then(res => setListDays(res)) //console.log(res)) //res.data.days)
+      .catch(error => console.log(error));
+  };
+  getDays();
+  const { days /*tasks*/ } = listDays;
+  // console.log(days);
+
+  if (days) {
+    // console.log(curDay);
+    dayArr = days.filter(
+      d => new Date(d.date).toDateString() !== new Date().toDateString()
+    );
+    // console.log(curDay);
+  } else {
+    dayArr = [
+      {
+        capstoneId: 5,
+        date: "2020-03-09T00:00:00",
+        dayNumber: 63,
+        totalMinutesWorked: 180,
+        totalMinutesBusy: 30,
+        totalMinutesSleep: 480,
+        totalMinutesFun: 180,
+        successul: true
+      }
+    ];
+  }
 
   //console.log(curIndex);
 
@@ -60,6 +103,7 @@ const PrevDaysScreen = props => {
     }
   ];
 
+  // getDays();
   //console.log(taskArr.length);
   return localStorage.getItem("info") ? (
     <>
@@ -72,13 +116,13 @@ const PrevDaysScreen = props => {
         </div>
         <div className="current">
           <DayView
-            date={props.days[curIndex].date}
-            dayNum={props.days[curIndex].dayNumber}
-            worked={props.days[curIndex].totalMinutesWorked / 60}
-            busy={props.days[curIndex].totalMinutesBusy / 60}
-            sleep={props.days[curIndex].totalMinutesSleep / 60}
-            fun={props.days[curIndex].totalMinutesFun / 60}
-            successful={props.days[curIndex].successful}
+            date={dayArr[curIndex].date}
+            dayNum={dayArr[curIndex].dayNumber}
+            worked={dayArr[curIndex].totalMinutesWorked / 60}
+            busy={dayArr[curIndex].totalMinutesBusy / 60}
+            sleep={dayArr[curIndex].totalMinutesSleep / 60}
+            fun={dayArr[curIndex].totalMinutesFun / 60}
+            successful={dayArr[curIndex].successful}
             tasks={taskArr}
             glow={true}
             current={false}

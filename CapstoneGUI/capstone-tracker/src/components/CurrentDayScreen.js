@@ -5,49 +5,41 @@ import axios from "axios";
 
 const CurrentDayDisplay = props => {
   const info = JSON.parse(localStorage.getItem("info"));
-  const { token } = info;
-  const [curDay, setCurDay] = useState({});
+  const { token } = info ? info : {};
+  let curDay = {
+    capstoneId: 5,
+    date: "2020-03-09T00:00:00",
+    dayNumber: 63,
+    totalMinutesWorked: 180,
+    totalMinutesBusy: 30,
+    totalMinutesSleep: 480,
+    totalMinutesFun: 180,
+    successul: true
+  };
+  const [listDays, setListDays] = useState({});
 
   const getDays = () => {
     axios({
       method: "get",
-      url: `https://localhost:44343/api/User/Capstone/${props.capstoneId}/Days`,
+      url: `https://localhost:44343/api/User/Capstone/5/Days`,
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-      .then(res => console.log(res)) //res.data.days)
-      .then(res => (res.length > 1 ? res[res.length - 1] : res[0]))
+      .then(res => res.data)
+      .then(res => setListDays(res)) //console.log(res)) //res.data.days)
       .catch(error => console.log(error));
   };
-
-  const getCurDay = () => {
-    const curDate = new Date();
-    // const temp = days.filter(
-    //   d => new Date(d.date).toDateString() !== curDate.todateString()
-    // );
-    // if (temp.length === 0) {
-    //   const lastDay = new Date(temp.pop());
-    //loop from that date until current date and add them all to the database
-    //for now just add the current day
-    setCurDay({
-      capstoneId: 5,
-      dayId: 1,
-      totalMinutesWorked: 0,
-      totalMinutesBusy: 0,
-      totalMinutesSleep: 0,
-      totalMinutesFun: 0,
-      date: curDate.toDateString(),
-      onTrack: true
-    });
-    // } else {
-    //   //set the curent day to the last day of temp
-    //   setCurDay(temp.pop());
-    // }
-  };
-
   getDays();
-
+  const { days /*tasks*/ } = listDays;
+  // console.log(days);
+  if (days) {
+    // console.log(curDay);
+    curDay = days.filter(
+      d => new Date(d.date).toDateString() === new Date().toDateString()
+    )[0];
+    // console.log(curDay);
+  }
   const {
     date,
     dayNumber,
@@ -59,7 +51,7 @@ const CurrentDayDisplay = props => {
   } = curDay;
 
   // console.log(days);
-  console.log(curDay);
+  // console.log(curDay);
   let tasks = [];
   return localStorage.getItem("info") ? (
     <>

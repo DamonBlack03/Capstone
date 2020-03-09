@@ -11,25 +11,11 @@ import Nav from "./Nav";
 import axios from "axios";
 
 export default function App() {
-  const [capstoneId, setCapstoneId] = useState(0);
+  const [capstoneId, setCapstoneId] = useState(5);
   const info = JSON.parse(localStorage.getItem("info"));
   const { token, user } = info ? info : {};
   const { userId } = user ? user : {};
 
-  const getCapstoneId = () => {
-    axios({
-      method: "get",
-      url: `https://localhost:44343/api/User/${userId}/Capstones`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => res.data.capstones[0])
-      .then(res => setCapstoneId(res.capstoneId))
-      .catch(error => console.log(error));
-  };
-
-  getCapstoneId();
   return (
     <>
       <Nav />
@@ -51,18 +37,20 @@ export default function App() {
         <Route
           path="/currentDay"
           exact
-          render={() => <CurrentDayDisplay capstoneId={capstoneId} />}
+          render={() => (
+            <CurrentDayDisplay
+            //   capstoneId={capstoneId}
+            //   days={days}
+            //   tasks={tasks}
+            />
+          )}
         />
         <Route
           path="/home"
           exact
           render={() => <HomeScreen userId={userId} capstoneId={capstoneId} />}
         />
-        <Route
-          path="/previousDays"
-          exact
-          render={() => <PrevDaysScreen capstoneId={capstoneId} />}
-        />
+        <Route path="/previousDays" exact render={() => <PrevDaysScreen />} />
       </div>
     </>
   );
