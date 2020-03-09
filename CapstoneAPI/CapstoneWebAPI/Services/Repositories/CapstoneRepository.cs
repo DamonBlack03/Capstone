@@ -38,12 +38,18 @@ namespace CapstoneWebAPI.Services.Repositories
 
         public Capstone GetCapstoneById(int id)
         {
-            return _context.Capstones.SingleOrDefault(c => c.CapstoneId == id);
+            Capstone capstone = _context.Capstones.SingleOrDefault(c => c.CapstoneId == id);
+
+            UpdateCapstone(capstone);
+
+            return capstone;
         }
 
         public List<Capstone> GetCapstonesByUserId(int id)
         {
-            return _context.Capstones.Where(c => c.UserId == id).ToList();
+            List<Capstone> capstones = _context.Capstones.Where(c => c.UserId == id).ToList();
+            capstones.ForEach(c => UpdateCapstone(c) );
+            return capstones;
         }
 
         public void RemoveCapstone(int id)
@@ -69,6 +75,7 @@ namespace CapstoneWebAPI.Services.Repositories
             int totS = 0;
             int totF = 0;
             days.ForEach(d => {
+                dayRepository.UpdateDay(d);
                 totB += d.TotalMinutesBusy; 
                 totW += d.TotalMinutesWorked;
                 totS += d.TotalMinutesSleep;
@@ -79,9 +86,41 @@ namespace CapstoneWebAPI.Services.Repositories
             capstone.TotalMinutesSleep = totS;
             capstone.TotalMinutesWorked = totW;
 
+            int weeksHours = (days.Count / capstone.DaysPerWeek) * capstone.HoursPerWeek;
+
+            capstone.OnTrack = (capstone.TotalMinutesWorked >= weeksHours) ? true : false;
+
             _context.Update(capstone);
             _context.SaveChanges();
         }
-        
+        public void UpdateCapstone(int capstoneId)
+        {
+            Capstone capstone = GetCapstoneById(capstoneId);
+            List<Day> days = dayRepository.GetDaysByCapstoneId(capstone.CapstoneId);
+            int totB = 0;
+            int totW = 0;
+            int totS = 0;
+            int totF = 0;
+            days.ForEach(d => {
+                dayRepository.UpdateDay(d);
+                totB += d.TotalMinutesBusy;
+                totW += d.TotalMinutesWorked;
+                totS += d.TotalMinutesSleep;
+                totF += d.TotalMinutesFun;
+            });
+            capstone.TotalMinutesBusy = totB;
+            capstone.TotalMinutesFun = totF;
+            capstone.TotalMinutesSleep = totS;
+            capstone.TotalMinutesWorked = totW;
+
+            int weeksHours = (days.Count / capstone.DaysPerWeek) * capstone.HoursPerWeek;
+
+            capstone.OnTrack = (capstone.TotalMinutesWorked >= weeksHours) ? true : false;
+
+
+            _context.Update(capstone);
+            _context.SaveChanges();
+        }
+
     }
 }

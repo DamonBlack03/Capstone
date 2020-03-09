@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 
 const RegisterBox = props => {
   const [username, setUsername] = useState("");
@@ -7,6 +8,8 @@ const RegisterBox = props => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);
   const [pwdState, setPwdState] = useState(null);
+  const history = useHistory();
+
   const showValidationErr = (elm, msg) => {
     //console.log({ elm, msg });
     setErrors(prevState => [
@@ -83,7 +86,9 @@ const RegisterBox = props => {
           username: username,
           password: password
         })
-        .then(res => console.log(res.data.token))
+        .then(res => JSON.stringify(res.data))
+        .then(res => localStorage.setItem("info", res))
+        .then(() => history.push("/setup"))
         .catch(error => console.log(error));
     }
   };

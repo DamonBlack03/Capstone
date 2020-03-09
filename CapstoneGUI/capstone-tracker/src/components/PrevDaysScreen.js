@@ -9,6 +9,8 @@ const PrevDaysScreen = props => {
   const { token } = info ? info : {};
   // const [days, setDays] = useState([]);
   let dayArr = [];
+  let allTaskArr = [];
+  let taskArr = [];
   // const [curDay, setCurDay] = useState(props.days[0]);
 
   const incCurIndexChange = () => {
@@ -35,7 +37,7 @@ const PrevDaysScreen = props => {
 
   const getDays = () => {
     axios({
-      method: "get",
+      method: "gett",
       url: `https://localhost:44343/api/User/Capstone/5/Days`,
       headers: {
         Authorization: `Bearer ${token}`
@@ -46,8 +48,8 @@ const PrevDaysScreen = props => {
       .catch(error => console.log(error));
   };
   getDays();
-  const { days /*tasks*/ } = listDays;
-  // console.log(days);
+  const { days, tasks } = listDays;
+  // console.log(tasks);
 
   if (days) {
     // console.log(curDay);
@@ -70,41 +72,110 @@ const PrevDaysScreen = props => {
     ];
   }
 
-  //console.log(curIndex);
-
-  let taskArr = [
-    {
-      category: "Work",
-      startTime: new Date(),
-      endTime: new Date(),
-      minutes: 0,
-      inProgress: false
-    },
-    {
-      category: "Work",
-      startTime: new Date(),
-      endTime: new Date(),
-      minutes: 0,
-      inProgress: true
-    },
-    {
-      category: "Work",
-      startTime: new Date(),
-      endTime: new Date(),
-      minutes: 0,
-      inProgress: true
-    },
-    {
-      category: "Work",
-      startTime: new Date(),
-      endTime: new Date(),
-      minutes: 0,
-      inProgress: true
-    }
-  ];
+  // console.log(tasks);
+  if (tasks) {
+    allTaskArr = tasks;
+  } else {
+    allTaskArr = [
+      [
+        {
+          category: "Work",
+          startTime: new Date(),
+          endTime: new Date(),
+          minutes: 0,
+          inProgress: false
+        },
+        {
+          category: "Work",
+          startTime: new Date(),
+          endTime: new Date(),
+          minutes: 0,
+          inProgress: true
+        },
+        {
+          category: "Work",
+          startTime: new Date(),
+          endTime: new Date(),
+          minutes: 0,
+          inProgress: true
+        },
+        {
+          category: "Work",
+          startTime: new Date(),
+          endTime: new Date(),
+          minutes: 0,
+          inProgress: true
+        }
+      ],
+      [
+        {
+          category: "Work",
+          startTime: new Date(),
+          endTime: new Date(),
+          minutes: 0,
+          inProgress: false
+        },
+        {
+          category: "Work",
+          startTime: new Date(),
+          endTime: new Date(),
+          minutes: 0,
+          inProgress: true
+        },
+        {
+          category: "Work",
+          startTime: new Date(),
+          endTime: new Date(),
+          minutes: 0,
+          inProgress: true
+        },
+        {
+          category: "Work",
+          startTime: new Date(),
+          endTime: new Date(),
+          minutes: 0,
+          inProgress: true
+        }
+      ]
+    ];
+  }
+  if (allTaskArr) {
+    taskArr = allTaskArr[curIndex];
+  } else {
+    taskArr = [
+      {
+        category: "Work",
+        startTime: new Date(),
+        endTime: new Date(),
+        minutes: 0,
+        inProgress: false
+      },
+      {
+        category: "Work",
+        startTime: new Date(),
+        endTime: new Date(),
+        minutes: 0,
+        inProgress: true
+      },
+      {
+        category: "Work",
+        startTime: new Date(),
+        endTime: new Date(),
+        minutes: 0,
+        inProgress: true
+      },
+      {
+        category: "Work",
+        startTime: new Date(),
+        endTime: new Date(),
+        minutes: 0,
+        inProgress: true
+      }
+    ];
+  }
 
   // getDays();
-  //console.log(taskArr.length);
+  console.log(taskArr);
   return localStorage.getItem("info") ? (
     <>
       <div className="root-display-container center">

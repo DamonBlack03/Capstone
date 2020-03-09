@@ -30,12 +30,20 @@ namespace CapstoneWebAPI.Services.Repositories
 
         public Day GetDayById(int id)
         {
-            return _context.Days.SingleOrDefault(d => d.DayId == id);
+            Day day = _context.Days.SingleOrDefault(d => d.DayId == id);
+
+            UpdateDay(day);
+
+            return day;
         }
 
         public List<Day> GetDaysByCapstoneId(int id)
         {
-            return _context.Days.Where(d => d.CapstoneId == id).ToList();
+            List<Day> days = _context.Days.Where(d => d.CapstoneId == id).ToList();
+
+            days.ForEach(d => UpdateDay(d));
+
+            return days;
         }
 
         public void RemoveDay(int id)
@@ -55,7 +63,73 @@ namespace CapstoneWebAPI.Services.Repositories
 
         public void UpdateDay(Day day)
         {
-            throw new NotImplementedException();
+            List<Task> tasks = taskRepository.GetTasksByDayId(day.DayId);
+            int minutesW = 0;
+            int minutesB = 0;
+            int minutesS = 0;
+            int minutesF = 0;
+            tasks.ForEach(t => {
+                switch (t.Category)
+                {
+                    case "Work":
+                        minutesW += t.Minutes;
+                        break;
+                    case "Busy":
+                        minutesB += t.Minutes;
+                        break;
+                    case "Sleep":
+                        minutesS += t.Minutes;
+                        break;
+                    default:
+                        minutesF += t.Minutes;
+                        break;
+                }
+            });
+
+            day.TotalMinutesBusy = minutesB;
+            day.TotalMinutesFun = minutesF;
+            day.TotalMinutesSleep = minutesS;
+            day.TotalMinutesWorked = minutesW;
+
+            _context.Update(day);
+            _context.SaveChanges();
+
+        }
+        public void UpdateDay(int dayId)
+        {
+            Day day = GetDayById(dayId);
+            List<Task> tasks = taskRepository.GetTasksByDayId(day.DayId);
+            int minutesW = 0;
+            int minutesB = 0;
+            int minutesS = 0;
+            int minutesF = 0;
+            tasks.ForEach(t => {
+                switch (t.Category)
+                {
+                    case "Work":
+                        minutesW += t.Minutes;
+                        break;
+                    case "Busy":
+                        minutesB += t.Minutes;
+                        break;
+                    case "Sleep":
+                        minutesS += t.Minutes;
+                        break;
+                    default:
+                        minutesF += t.Minutes;
+                        break;
+                }
+            });
+
+            day.TotalMinutesBusy = minutesB;
+            day.TotalMinutesFun = minutesF;
+            day.TotalMinutesSleep = minutesS;
+            day.TotalMinutesWorked = minutesW;
+            day.Successful = (day.TotalMinutesBusy >= 180) ? true : false;
+            
+
+            _context.Update(day);
+            _context.SaveChanges();
         }
     }
 }

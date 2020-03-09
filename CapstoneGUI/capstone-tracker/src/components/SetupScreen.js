@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Redirect } from "react-router";
+import { Redirect, useHistory } from "react-router";
+import axios from "axios";
 
 const SetupScreen = props => {
   const [hoursPerWeek, setHoursPerWeek] = useState(0);
@@ -8,6 +9,10 @@ const SetupScreen = props => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [errors, setErrors] = useState([]);
+  const history = useHistory();
+  const info = JSON.parse(localStorage.getItem("info"));
+  const { token, user } = info ? info : {};
+  const { userId } = user ? user : {};
 
   const showValidationErr = (elm, msg) => {
     console.log({ elm, msg });
@@ -46,11 +51,13 @@ const SetupScreen = props => {
   };
   const onStartDateChange = e => {
     setStartDate(new Date(e.target.value));
+    console.log(new Date(e.target.value).toISOString().split(".")[0]);
     clearValidationErr("startDate");
     clearValidationErr("endDate");
   };
   const onEndDateChange = e => {
     setEndDate(new Date(e.target.value));
+    console.log(new Date(e.target.value).toISOString().split(".")[0]);
     clearValidationErr("startDate");
     clearValidationErr("endDate");
   };
@@ -68,7 +75,33 @@ const SetupScreen = props => {
         showValidationErr("endDate", "End date must be after start date");
       }
     } else {
-      console.log("continue");
+      let c = {
+        userId: userId,
+        name: "Capstone",
+        description: "10 week Passion Project used to enhance knowledge",
+        totalMinutesWorked: 0,
+        totalMinutesBusy: 0,
+        totalMinutesSleep: 0,
+        totalMinutesFun: 0,
+        meetingDay: checkInDay,
+        hoursPerWeek: hoursPerWeek,
+        daysPerWeek: daysPerWeek,
+        startDate: startDate.toISOString().split(".")[0],
+        endDate: endDate.toISOString().split(".")[0],
+        onTrack: true
+      };
+      console.log(c);
+      axios({
+        method: "post",
+        url: `https://localhost:44343/api/User/${userId}/Capstone`,
+        headers: {
+          ContentType: "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        data: c
+      })
+        .then(() => history.push("/home"))
+        .catch(error => console.log(error));
     }
   };
 

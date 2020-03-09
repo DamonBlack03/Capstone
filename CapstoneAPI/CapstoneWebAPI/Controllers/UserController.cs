@@ -238,7 +238,7 @@ namespace CapstoneWebAPI.Controllers
         {
             if (capstone == null)
             {
-                return BadRequest();
+                return BadRequest("Capstone is null");
             }
 
             if (CapstoneExists(UserId) && capstone.UserId == UserId)
@@ -269,20 +269,21 @@ namespace CapstoneWebAPI.Controllers
         public ActionResult GetCapstonesByUserId([Required] int UserId)
         {
             List<Capstone> capstones = capstoneRepository.GetCapstonesByUserId(UserId);
-
+            Capstone capstone = capstones[0];
             if (capstones.Count == 0)
             {
                 return BadRequest("No Capstones for this user");
             }
 
-            List<List<Day>> days = new List<List<Day>>();
+            capstoneRepository.UpdateCapstone(capstone);
 
-            foreach (Capstone capstone in capstones)
-            {
-                days.Add(dayRepository.GetDaysByCapstoneId(capstone.CapstoneId));
-            }
+            List<Day> days;
 
-            return Ok(new { status = 200, capstones, days});
+           
+            days = dayRepository.GetDaysByCapstoneId(capstone.CapstoneId);
+           
+
+            return Ok(new { status = 200, capstone, days});
         }
 
         [HttpDelete("{UserId}/Capstone/{capstoneId}"), Authorize]
@@ -354,7 +355,7 @@ namespace CapstoneWebAPI.Controllers
 
             dayRepository.CreateDay(day);
             _dayContext.SaveChanges();
-            capstoneRepository.UpdateCapstone(capstoneRepository.GetCapstoneById(capstoneId));
+            capstoneRepository.UpdateCapstone(capstoneId);
             return Ok();
         }
         
@@ -386,10 +387,10 @@ namespace CapstoneWebAPI.Controllers
             {
                 return NotFound("No days found for this Capstone");
             }
-            List<ActionResult> tasks = new List<ActionResult>();// = GetTaskByDayId(1);
+            List<List<Task>> tasks = new List<List<Task>>();// = GetTaskByDayId(1);
             foreach (Day day in days)
             {
-                tasks.Add(GetTaskByDayId(day.DayId));
+                tasks.Add(taskRepository.GetTasksByDayId(day.DayId));
             }
 
             return Ok(new { status = 200, days, tasks });
@@ -463,6 +464,7 @@ namespace CapstoneWebAPI.Controllers
 
             taskRepository.CreateTask(task);
             _taskContext.SaveChanges();
+            dayRepository.UpdateDay(dayId);
 
             return Ok();
         }

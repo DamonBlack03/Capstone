@@ -18,7 +18,7 @@ const HomeScreen = props => {
         Authorization: `Bearer ${token}`
       }
     })
-      .then(res => res.data.capstones[0])
+      .then(res => res.data.capstone)
       .then(res => setCapstoneInfo(res))
       .catch(error => console.log(error));
   };

@@ -4,20 +4,6 @@ import TaskView from "./TaskView";
 
 const DayView = props => {
   const [modalIsOpen, setModalOpen] = useState(false);
-  const customStyles = {
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "auto",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-      height: "50vh",
-      width: "45vh",
-      backgroundColor: "#160F29",
-      overflowY: "auto"
-    }
-  };
 
   const openModal = () => {
     setModalOpen(true);
@@ -34,7 +20,10 @@ const DayView = props => {
   };
 
   var items = [];
-
+  // console.log(`Info: ${props.tasks}`);
+  if (props.tasks) {
+    console.log("yes");
+  }
   props.tasks.forEach(element => {
     items.push(<TaskView taskInfo={element} />);
   });
