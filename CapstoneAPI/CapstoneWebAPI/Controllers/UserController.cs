@@ -269,12 +269,12 @@ namespace CapstoneWebAPI.Controllers
         public ActionResult GetCapstonesByUserId([Required] int UserId)
         {
             List<Capstone> capstones = capstoneRepository.GetCapstonesByUserId(UserId);
-            Capstone capstone = capstones[0];
             if (capstones.Count == 0)
             {
                 return BadRequest("No Capstones for this user");
             }
 
+            Capstone capstone = capstones[0];
             capstoneRepository.UpdateCapstone(capstone);
 
             List<Day> days;
@@ -283,7 +283,7 @@ namespace CapstoneWebAPI.Controllers
             days = dayRepository.GetDaysByCapstoneId(capstone.CapstoneId);
            
 
-            return Ok(new { status = 200, capstone, days});
+            return Ok(new { status = 200, capstone/*, days*/});
         }
 
         [HttpDelete("{UserId}/Capstone/{capstoneId}"), Authorize]
@@ -393,7 +393,7 @@ namespace CapstoneWebAPI.Controllers
                 tasks.Add(taskRepository.GetTasksByDayId(day.DayId));
             }
 
-            return Ok(new { status = 200, days, tasks });
+            return Ok(new { status = 200, days /*tasks*/ });
         }
 
         [HttpDelete("Capstone/{capstoneId}/Day/{dayId}"), Authorize]
@@ -492,10 +492,10 @@ namespace CapstoneWebAPI.Controllers
 
             List<Task> tasks = taskRepository.GetTasksByDayId(dayId);
 
-            if (tasks.Count < 1)
-            {
-                return NotFound("There are no Tasks for this Day");
-            }
+            //if (tasks.Count < 1)
+            //{
+            //    return NotFound("There are no Tasks for this Day");
+            //}
 
             return Ok(new { status = 200, tasks });
         }

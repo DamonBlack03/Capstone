@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
+import axios from "axios";
 import TaskView from "./TaskView";
 
 const DayView = props => {
+  const info = JSON.parse(localStorage.getItem("info"));
+  const { token, user } = info ? info : {};
+  // const userId = user ? user : {}
   const [modalIsOpen, setModalOpen] = useState(false);
-
+  const [tasks, setTasks] = useState([]);
+  const day = props.day;
   const openModal = () => {
     setModalOpen(true);
   };
@@ -18,16 +23,30 @@ const DayView = props => {
   const closeModal = () => {
     setModalOpen(false);
   };
+  const getTasks = () => {
+    axios({
+      method: "get",
+      url: `https://localhost:44343/api/User/Day/${day.dayId}/Tasks`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => res.data.tasks)
+      .then(res => setTasks(res))
+      .catch(error => console.log(error));
+  };
+
+  getTasks();
 
   var items = [];
   // console.log(`Info: ${props.tasks}`);
-  if (props.tasks) {
-    console.log("yes");
+  if (tasks) {
+    // console.log("yes");
+    tasks.forEach(element => {
+      items.push(<TaskView taskInfo={element} />);
+    });
   }
-  props.tasks.forEach(element => {
-    items.push(<TaskView taskInfo={element} />);
-  });
-
+  // console.log(tasks);
   return (
     <>
       <div
@@ -35,7 +54,7 @@ const DayView = props => {
           props.current
             ? "current-box-container"
             : props.glow
-            ? props.successful
+            ? day.successful
               ? "good-box-container"
               : "bad-box-container"
             : "box-container"
@@ -56,19 +75,25 @@ const DayView = props => {
         </Modal>
 
         <div className="box">
-          <div className="display-view">Day {props.dayNum}</div>
+          <div className="display-view">Day {day.dayNumber}</div>
           <div className="display-view">
             <label className="display-label">
-              Date: {new Date(props.date).toDateString()}
+              Date:{new Date(day.date).toDateString()}
             </label>
             <label className="display-label">
-              Hours Worked: {props.worked}
+              Hours Worked: {day.totalMinutesWorked / 60}
             </label>
-            <label className="display-label">Hours Busy: {props.busy}</label>
-            <label className="display-label">Hours Sleep: {props.sleep}</label>
-            <label className="display-label">Hours Fun: {props.fun}</label>
             <label className="display-label">
-              Successful: {props.successful ? "yes" : "no"}
+              Hours Busy: {day.totalMinutesBusy / 60}
+            </label>
+            <label className="display-label">
+              Hours Sleep: {day.totalMinutesSleep / 60}
+            </label>
+            <label className="display-label">
+              Hours Fun: {day.totalMinutesFun / 60}
+            </label>
+            <label className="display-label">
+              Successful: {day.successful ? "yes" : "no"}
             </label>
           </div>
           <button type="button" className="login-btn" onClick={openPopup}>

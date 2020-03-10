@@ -5,13 +5,11 @@ import axios from "axios";
 
 const PrevDaysScreen = props => {
   const [curIndex, setCurIndex] = useState(0);
+  const capstoneInfo = props.capstone;
   const info = JSON.parse(localStorage.getItem("info"));
   const { token } = info ? info : {};
-  // const [days, setDays] = useState([]);
+  const [days, setDays] = useState([]);
   let dayArr = [];
-  let allTaskArr = [];
-  let taskArr = [];
-  // const [curDay, setCurDay] = useState(props.days[0]);
 
   const incCurIndexChange = () => {
     let temp = curIndex;
@@ -33,181 +31,63 @@ const PrevDaysScreen = props => {
     setCurIndex(temp);
   };
 
-  const [listDays, setListDays] = useState({});
-
   const getDays = () => {
     axios({
-      method: "gett",
-      url: `https://localhost:44343/api/User/Capstone/5/Days`,
+      method: "get",
+      url: `https://localhost:44343/api/User/Capstone/${capstoneInfo}/Days`,
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-      .then(res => res.data)
-      .then(res => setListDays(res)) //console.log(res)) //res.data.days)
+      .then(res => res.data.days)
+      .then(res => setDays(res))
       .catch(error => console.log(error));
   };
+
   getDays();
-  const { days, tasks } = listDays;
-  // console.log(tasks);
 
   if (days) {
-    // console.log(curDay);
     dayArr = days.filter(
-      d => new Date(d.date).toDateString() !== new Date().toDateString()
+      d =>
+        new Date(d.date).toISOString().split("T")[0] !==
+        new Date().toISOString().split("T")[0]
     );
-    // console.log(curDay);
-  } else {
-    dayArr = [
-      {
-        capstoneId: 5,
-        date: "2020-03-09T00:00:00",
-        dayNumber: 63,
-        totalMinutesWorked: 180,
-        totalMinutesBusy: 30,
-        totalMinutesSleep: 480,
-        totalMinutesFun: 180,
-        successul: true
-      }
-    ];
   }
-
-  // console.log(tasks);
-  if (tasks) {
-    allTaskArr = tasks;
-  } else {
-    allTaskArr = [
-      [
-        {
-          category: "Work",
-          startTime: new Date(),
-          endTime: new Date(),
-          minutes: 0,
-          inProgress: false
-        },
-        {
-          category: "Work",
-          startTime: new Date(),
-          endTime: new Date(),
-          minutes: 0,
-          inProgress: true
-        },
-        {
-          category: "Work",
-          startTime: new Date(),
-          endTime: new Date(),
-          minutes: 0,
-          inProgress: true
-        },
-        {
-          category: "Work",
-          startTime: new Date(),
-          endTime: new Date(),
-          minutes: 0,
-          inProgress: true
-        }
-      ],
-      [
-        {
-          category: "Work",
-          startTime: new Date(),
-          endTime: new Date(),
-          minutes: 0,
-          inProgress: false
-        },
-        {
-          category: "Work",
-          startTime: new Date(),
-          endTime: new Date(),
-          minutes: 0,
-          inProgress: true
-        },
-        {
-          category: "Work",
-          startTime: new Date(),
-          endTime: new Date(),
-          minutes: 0,
-          inProgress: true
-        },
-        {
-          category: "Work",
-          startTime: new Date(),
-          endTime: new Date(),
-          minutes: 0,
-          inProgress: true
-        }
-      ]
-    ];
-  }
-  if (allTaskArr) {
-    taskArr = allTaskArr[curIndex];
-  } else {
-    taskArr = [
-      {
-        category: "Work",
-        startTime: new Date(),
-        endTime: new Date(),
-        minutes: 0,
-        inProgress: false
-      },
-      {
-        category: "Work",
-        startTime: new Date(),
-        endTime: new Date(),
-        minutes: 0,
-        inProgress: true
-      },
-      {
-        category: "Work",
-        startTime: new Date(),
-        endTime: new Date(),
-        minutes: 0,
-        inProgress: true
-      },
-      {
-        category: "Work",
-        startTime: new Date(),
-        endTime: new Date(),
-        minutes: 0,
-        inProgress: true
-      }
-    ];
-  }
-
-  // getDays();
-  console.log(taskArr);
+  // console.log(dayArr);
   return localStorage.getItem("info") ? (
-    <>
-      <div className="root-display-container center">
-        <div>
-          <div className="left-arrow" onClick={decCurIndexChange}>
-            <div className="left-arrow-top"></div>
-            <div className="left-arrow-bottom"></div>
+    dayArr.length > 0 ? (
+      <>
+        <div className="root-display-container center">
+          <div>
+            <div className="left-arrow" onClick={decCurIndexChange}>
+              <div className="left-arrow-top"></div>
+              <div className="left-arrow-bottom"></div>
+            </div>
           </div>
-        </div>
-        <div className="current">
-          <DayView
-            date={dayArr[curIndex].date}
-            dayNum={dayArr[curIndex].dayNumber}
-            worked={dayArr[curIndex].totalMinutesWorked / 60}
-            busy={dayArr[curIndex].totalMinutesBusy / 60}
-            sleep={dayArr[curIndex].totalMinutesSleep / 60}
-            fun={dayArr[curIndex].totalMinutesFun / 60}
-            successful={dayArr[curIndex].successful}
-            tasks={taskArr}
-            glow={true}
-            current={false}
-          />
-        </div>
+          <div className="current">
+            <DayView day={dayArr[curIndex]} glow={true} current={false} />
+          </div>
 
-        <div>
-          <div className="right-arrow" onClick={incCurIndexChange}>
-            <div className="right-arrow-top"></div>
-            <div className="right-arrow-bottom"></div>
+          <div>
+            <div className="right-arrow" onClick={incCurIndexChange}>
+              <div className="right-arrow-top"></div>
+              <div className="right-arrow-bottom"></div>
+            </div>
           </div>
         </div>
-      </div>
-    </>
+      </>
+    ) : (
+      <>
+        <div className="root-container">
+          <div className="box-container">
+            <div className="inner-container">
+              <div className="header">No days Found</div>
+              <div className="box"></div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
   ) : (
     <Redirect to="/" />
   );

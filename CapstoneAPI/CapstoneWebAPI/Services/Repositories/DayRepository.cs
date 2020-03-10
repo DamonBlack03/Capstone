@@ -20,6 +20,10 @@ namespace CapstoneWebAPI.Services.Repositories
 
         public void CreateDay(Day day)
         {
+            List<Day> days = GetDaysByCapstoneId(day.CapstoneId);
+
+            day.DayNumber = days.Count == 0 ? 1 : days.Last().DayNumber + 1;
+
             _context.Days.Add(day);
         }
 

@@ -1,7 +1,7 @@
 import React from "react";
 
 const TaskView = props => {
-  console.log(props.taskInfo);
+  // console.log(props.taskInfo);
   return (
     <>
       <div className="box-container">

@@ -3,6 +3,8 @@ import { Redirect, useHistory } from "react-router";
 import axios from "axios";
 
 const SetupScreen = props => {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [hoursPerWeek, setHoursPerWeek] = useState(0);
   const [checkInDay, setCheckInDay] = useState("");
   const [daysPerWeek, setDaysPerWeek] = useState(7);
@@ -39,6 +41,18 @@ const SetupScreen = props => {
     });
   };
 
+  const onNameChange = e => {
+    console.log(e.target.value);
+    setName(e.target.value);
+    clearValidationErr("name");
+  };
+
+  const onDescriptionChange = e => {
+    console.log(e.target.value);
+    setDescription(e.target.value);
+    clearValidationErr("description");
+  };
+
   const onHoursPerWeekChange = e => {
     console.log(e.target.value);
     setHoursPerWeek(e.target.value);
@@ -53,6 +67,7 @@ const SetupScreen = props => {
     setStartDate(new Date(e.target.value));
     console.log(new Date(e.target.value).toISOString().split(".")[0]);
     clearValidationErr("startDate");
+    clearValidationErr("startDateBack");
     clearValidationErr("endDate");
   };
   const onEndDateChange = e => {
@@ -63,28 +78,42 @@ const SetupScreen = props => {
   };
 
   const handleOnSubmit = e => {
-    if (hoursPerWeek === 0 || checkInDay === "" || startDate >= endDate) {
+    let day = new Date();
+    if (
+      hoursPerWeek === 0 ||
+      checkInDay === "" ||
+      startDate >= endDate ||
+      name === "" ||
+      description === ""
+    ) {
       if (hoursPerWeek === 0) {
         showValidationErr("hoursPerWeek", "Hours per week must not be 0");
       }
       if (checkInDay === "") {
         showValidationErr("checkInDay", "You must pick a check in day");
       }
+
       if (startDate >= endDate) {
         showValidationErr("startDate", "Start date must be before end date");
         showValidationErr("endDate", "End date must be after start date");
       }
+      if (name === "") {
+        showValidationErr("name", "You must enter a name for your Capstone");
+      }
+      if (description === "") {
+        showValidationErr("description", "You must describe your Capstone");
+      }
     } else {
       let c = {
         userId: userId,
-        name: "Capstone",
-        description: "10 week Passion Project used to enhance knowledge",
+        name: name,
+        description: description,
         totalMinutesWorked: 0,
         totalMinutesBusy: 0,
         totalMinutesSleep: 0,
         totalMinutesFun: 0,
         meetingDay: checkInDay,
-        hoursPerWeek: hoursPerWeek,
+        hoursPerWeek: parseInt(hoursPerWeek),
         daysPerWeek: daysPerWeek,
         startDate: startDate.toISOString().split(".")[0],
         endDate: endDate.toISOString().split(".")[0],
@@ -106,13 +135,22 @@ const SetupScreen = props => {
   };
 
   // console.log(errors["hoursPerWeek"]);
-  let hoursErr = null,
+  let nameErr = null,
+    descripErr = null,
+    hoursErr = null,
     checkInErr = null,
     startErr = null,
+    startBackErr = null,
     endErr = null;
   //console.log("before loop: ", errors);
 
   for (let err in errors) {
+    if (errors[err].elm === "name") {
+      nameErr = errors[err].msg;
+    }
+    if (errors[err].elm === "description") {
+      descripErr = errors[err].msg;
+    }
     if (errors[err].elm === "hoursPerWeek") {
       hoursErr = errors[err].msg;
     }
@@ -121,6 +159,9 @@ const SetupScreen = props => {
     }
     if (errors[err].elm === "startDate") {
       startErr = errors[err].msg;
+    }
+    if (errors[err].elm === "startDateBack") {
+      startBackErr = errors[err].msg;
     }
     if (errors[err].elm === "endDate") {
       endErr = errors[err].msg;
@@ -134,6 +175,30 @@ const SetupScreen = props => {
           <div className="inner-container">
             <div className="header">Setup</div>
             <div className="box">
+              <div className="input-group">
+                <label htmlFor="name">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  className="login-input"
+                  placeholder="Name"
+                  onChange={onNameChange}
+                />
+                <small className="danger-error">{nameErr ? nameErr : ""}</small>
+              </div>
+              <div className="input-group">
+                <label htmlFor="description">Description</label>
+                <input
+                  type="text"
+                  name="description"
+                  className="login-input"
+                  placeholder="Description"
+                  onChange={onDescriptionChange}
+                />
+                <small className="danger-error">
+                  {descripErr ? descripErr : ""}
+                </small>
+              </div>
               <div className="input-group">
                 <label htmlFor="hoursPerWeek">Hours Per Week</label>
                 <select
@@ -185,7 +250,8 @@ const SetupScreen = props => {
                   defaultValue={startDate.toISOString().split("T")[0]}
                 />
                 <small className="danger-error">
-                  {startErr ? startErr : ""}
+                  <div>{startBackErr ? startBackErr : ""}</div>
+                  <div>{startErr ? startErr : ""}</div>
                 </small>
               </div>
 

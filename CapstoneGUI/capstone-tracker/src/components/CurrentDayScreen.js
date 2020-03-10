@@ -1,85 +1,125 @@
 import React, { useState } from "react";
 import DayView from "./DayView";
-import { Redirect } from "react-router";
+import { Redirect, useHistory } from "react-router-dom";
 import axios from "axios";
+import TaskPopUp from "./TaskPopUp";
+import Modal from "react-modal";
 
 const CurrentDayDisplay = props => {
   const info = JSON.parse(localStorage.getItem("info"));
   const { token } = info ? info : {};
-  let curDay = {
-    capstoneId: 5,
-    date: "2020-03-09T00:00:00",
-    dayNumber: 63,
-    totalMinutesWorked: 180,
-    totalMinutesBusy: 30,
-    totalMinutesSleep: 480,
-    totalMinutesFun: 180,
-    successul: true
-  };
-  const [listDays, setListDays] = useState({});
+  const capstoneInfo = props.capstone;
+  const [dayArr, setDayArr] = useState([]);
+  const [modalIsOpen, setModalOpen] = useState(false);
+  let curDay = {};
+  const history = useHistory();
 
-  const getDays = () => {
+  const openModal = () => {
+    setModalOpen(true);
+  };
+
+  const openPopup = () => {
+    openModal();
+  };
+
+  const afterOpenModal = () => {};
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
+  const createDay = () => {
+    axios({
+      method: "post",
+      url: `https://localhost:44343/api/User/Capstone/${capstoneInfo}/Day`,
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      data: {
+        capstoneId: capstoneInfo,
+        date: new Date().toISOString().split("T")[0],
+        totalMinutesWorked: 0,
+        totalMinutesBusy: 0,
+        totalMinutesSleep: 0,
+        totalMinutesFun: 0,
+        successful: false
+      }
+    })
+      .then(() => history.push("/currentDay"))
+      .catch(error => console.log(error));
+  };
+
+  const getDay = () => {
     axios({
       method: "get",
-      url: `https://localhost:44343/api/User/Capstone/5/Days`,
+      url: `https://localhost:44343/api/User/Capstone/${capstoneInfo}/Days`,
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-      .then(res => res.data)
-      .then(res => setListDays(res)) //console.log(res)) //res.data.days)
+      .then(res => res.data.days)
+      .then(res => setDayArr(res))
       .catch(error => console.log(error));
   };
-  getDays();
-  const { days /*tasks*/ } = listDays;
-  // console.log(days);
-  if (days) {
-    // console.log(curDay);
-    curDay = days.filter(
-      d => new Date(d.date).toDateString() === new Date().toDateString()
-    )[0];
-    // console.log(curDay);
+
+  getDay();
+
+  if (dayArr) {
+    let temp = dayArr.filter(
+      d =>
+        new Date(d.date).toISOString().split("T")[0] ===
+        new Date().toISOString().split("T")[0]
+    );
+    if (temp.length > 0) {
+      curDay = temp[0];
+    } else {
+      curDay = undefined;
+    }
   }
-  const {
-    date,
-    dayNumber,
-    totalMinutesWorked,
-    totalMinutesBusy,
-    totalMinutesSleep,
-    totalMinutesFun,
-    successful
-  } = curDay;
 
-  // console.log(days);
+  // console.log(dayArr);
   // console.log(curDay);
-  let tasks = [];
+
   return localStorage.getItem("info") ? (
-    <>
-      <div className="root-container center">
-        <div
-          className={
-            curDay.successful ? "good-box-container" : "bad-box-container"
-          }
+    curDay ? (
+      <>
+        <Modal
+          isOpen={modalIsOpen}
+          onAfterOpen={afterOpenModal}
+          onRequestClose={closeModal}
+          className="modal"
+          contentLabel="Example Modal"
         >
-          <div className="header">CurrentDay</div>
+          <div className="box">
+            <label className="modal-header">Task Form</label>
+            {<TaskPopUp day={curDay} click={closeModal} />}
+          </div>
+        </Modal>
+        <div className="root-container center">
+          <div className={true ? "good-box-container" : "bad-box-container"}>
+            <div className="header">CurrentDay</div>
 
-          <DayView
-            date={date}
-            dayNum={dayNumber}
-            worked={totalMinutesWorked / 60}
-            busy={totalMinutesBusy / 60}
-            sleep={totalMinutesSleep / 60}
-            fun={totalMinutesFun / 60}
-            successful={successful}
-            tasks={tasks}
-            glow={false}
-            current={true}
-          />
+            <DayView day={curDay} glow={false} current={true} />
 
-          <button className="login-btn">Edit</button>
+            <button className="login-btn" onClick={openPopup}>
+              Edit Tasks
+            </button>
+          </div>
+        </div>
+      </>
+    ) : (
+      <div className="root-container center">
+        <div className="box-container">
+          <div className="inner-container">
+            <div className="box">
+              <button onClick={createDay} className="login-btn">
+                Create Day
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </>
+    )
   ) : (
     <Redirect to="/" />
   );

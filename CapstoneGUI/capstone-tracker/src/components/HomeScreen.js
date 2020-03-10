@@ -5,27 +5,9 @@ import { CRUDCommands } from "./CRUDCommands";
 
 const HomeScreen = props => {
   const info = JSON.parse(localStorage.getItem("info"));
-  const { token } = info ? info : {};
-  //const capstoneId = props.capstoneId;
-  const userId = props.userId;
-  const [capstoneInfo, setCapstoneInfo] = useState({});
-
-  const getCapstone = () => {
-    axios({
-      method: "get",
-      url: `https://localhost:44343/api/User/${userId}/Capstones`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-      .then(res => res.data.capstone)
-      .then(res => setCapstoneInfo(res))
-      .catch(error => console.log(error));
-  };
-
-  getCapstone();
-
-  // console.log(capstoneInfo);
+  const { token, user } = info ? info : {};
+  const userId = user ? user : {};
+  const capstoneInfo = props.capstone;
 
   return localStorage.getItem("info") ? (
     <>
