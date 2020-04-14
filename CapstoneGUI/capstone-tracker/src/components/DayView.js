@@ -81,16 +81,16 @@ const DayView = props => {
               Date:{new Date(day.date).toDateString()}
             </label>
             <label className="display-label">
-              Hours Worked: {day.totalMinutesWorked / 60}
+              Hours Worked: {(day.totalMinutesWorked / 60).toFixed(2)}
             </label>
             <label className="display-label">
-              Hours Busy: {day.totalMinutesBusy / 60}
+              Hours Busy: {(day.totalMinutesBusy / 60).toFixed(2)}
             </label>
             <label className="display-label">
-              Hours Sleep: {day.totalMinutesSleep / 60}
+              Hours Sleep: {(day.totalMinutesSleep / 60).toFixed(2)}
             </label>
             <label className="display-label">
-              Hours Fun: {day.totalMinutesFun / 60}
+              Hours Fun: {(day.totalMinutesFun / 60).toFixed(2)}
             </label>
             <label className="display-label">
               Successful: {day.successful ? "yes" : "no"}

@@ -96,7 +96,11 @@ const CurrentDayDisplay = props => {
           </div>
         </Modal>
         <div className="root-container center">
-          <div className={true ? "good-box-container" : "bad-box-container"}>
+          <div
+            className={
+              curDay.successful ? "good-box-container" : "bad-box-container"
+            }
+          >
             <div className="header">CurrentDay</div>
 
             <DayView day={curDay} glow={false} current={true} />

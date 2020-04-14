@@ -29,16 +29,17 @@ const HomeScreen = props => {
                 </label>
                 <label className="display-label">
                   Hours Worked:{" "}
-                  {Math.floor(capstoneInfo.totalMinutesWorked / 60)}
+                  {(capstoneInfo.totalMinutesWorked / 60).toFixed(2)}
                 </label>
                 <label className="display-label">
-                  Hours Busy: {Math.floor(capstoneInfo.totalMinutesBusy / 60)}
+                  Hours Busy: {(capstoneInfo.totalMinutesBusy / 60).toFixed(2)}
                 </label>
                 <label className="display-label">
-                  Hours Sleep: {Math.floor(capstoneInfo.totalMinutesSleep / 60)}
+                  Hours Sleep:{" "}
+                  {(capstoneInfo.totalMinutesSleep / 60).toFixed(2)}
                 </label>
                 <label className="display-label">
-                  Hours Fun: {Math.floor(capstoneInfo.totalMinutesFun / 60)}
+                  Hours Fun: {(capstoneInfo.totalMinutesFun / 60).toFixed(2)}
                 </label>
                 <label className="display-label">
                   Meeting day: {capstoneInfo.meetingDay}

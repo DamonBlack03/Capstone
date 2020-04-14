@@ -8,12 +8,8 @@ const TaskPopUp = props => {
   const { userId } = user ? user : {};
   const day = props.day;
   const [category, setCategory] = useState("");
-  const [startTime, setStartTime] = useState(
-    new Date().toISOString().split(".")[0]
-  );
-  const [endTime, setEndTime] = useState(
-    new Date().toISOString().split(".")[0]
-  );
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
   const [minutes, setMinutes] = useState(0);
   const [inProgress, setInProgress] = useState(true);
   const history = useHistory();
@@ -26,8 +22,34 @@ const TaskPopUp = props => {
     setCategory(e.target.value);
   };
 
+  const getDate = d => {
+    const appendLeadingZeroes = n => {
+      if (n <= 9) {
+        return "0" + n;
+      }
+      return n;
+    };
+    //   let current_datetime = new Date();
+    // console.log(current_datetime.toString());
+    let formatted_date =
+      d.getFullYear() +
+      "-" +
+      appendLeadingZeroes(d.getMonth() + 1) +
+      "-" +
+      appendLeadingZeroes(d.getDate()) +
+      "T" +
+      appendLeadingZeroes(d.getHours()) +
+      ":" +
+      appendLeadingZeroes(d.getMinutes()) +
+      ":" +
+      appendLeadingZeroes(d.getSeconds());
+
+    return formatted_date;
+  };
   const handleAdd = e => {
     addTask();
+
+    // console.log(getDate(startTime));
     props.click();
   };
   const handleUpdate = e => {
@@ -71,8 +93,8 @@ const TaskPopUp = props => {
       data: {
         dayId: day.dayId,
         category: category,
-        startTime: startTime,
-        endTime: endTime,
+        startTime: getDate(startTime),
+        endTime: getDate(endTime),
         minutes: minutes,
         inProgress: inProgress
       }
@@ -94,7 +116,7 @@ const TaskPopUp = props => {
         dayId: day.dayId,
         category: task.category,
         startTime: task.startTime,
-        endTime: endTime,
+        endTime: getDate(endTime),
         minutes: Math.floor(
           (new Date(endTime) - new Date(task.startTime)) / 60000
         ),
