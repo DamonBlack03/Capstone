@@ -1,0 +1,10 @@
+1 - create sql database named "Capstone"
+2 - run user script
+3 - run capstone script
+4 - run day script
+5 - run task script
+6 - open appsettings.json in api
+7 - under "UserDatabase" in "ConnectionStrings" change "Data Source=LAPTOP-CHQC7UPI;" to "Data Source=[your source];"
+	1 - to find your source in ssms, right click the database
+	2 - select properties
+	3 - somewhere in the body left it will say server. under that is your source NOT whats under connection  
